@@ -1,6 +1,7 @@
 package japicmp.model;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.JarArchiveComparator;
 import japicmp.util.AnnotationHelper;
 import japicmp.util.Constants;
 import japicmp.util.MethodDescriptorParser;
@@ -31,6 +32,7 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
 	private final JApiType type;
 	private boolean binaryCompatible = true;
+  private JarArchiveComparator jarArchiveComparator;
 
 	public JApiField(JApiChangeStatus changeStatus, Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional) {
         this.oldFieldOptional = oldFieldOptional;
@@ -45,6 +47,11 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
         this.type = extractType(oldFieldOptional, newFieldOptional);
         this.changeStatus = evaluateChangeStatus(changeStatus);
     }
+
+	public JApiField(JarArchiveComparator jarArchiveComparator, JApiChangeStatus changeStatus, Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional) {
+    this(changeStatus, oldFieldOptional, newFieldOptional);
+    this.jarArchiveComparator = jarArchiveComparator;
+  }
 
     private void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<CtField> oldBehavior, Optional<CtField> newBehavior) {
         AnnotationHelper.computeAnnotationChanges(annotations, oldBehavior, newBehavior, new AnnotationHelper.AnnotationsAttributeCallback<CtField>() {
@@ -104,7 +111,8 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 			if (this.transientModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
-            if (this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+            if ((jarArchiveComparator == null || !jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreSynthetic()) &&
+                this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
             if (this.type.getChangeStatus() != JApiChangeStatus.UNCHANGED) {

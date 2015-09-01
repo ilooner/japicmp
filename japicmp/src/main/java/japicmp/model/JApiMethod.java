@@ -1,6 +1,7 @@
 package japicmp.model;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.JarArchiveComparator;
 import japicmp.exception.JApiCmpException;
 import japicmp.util.MethodDescriptorParser;
 import javassist.CtMethod;
@@ -19,6 +20,14 @@ public class JApiMethod extends JApiBehavior {
         this.newMethod = newMethod;
         this.returnType = computeReturnTypeChanges(oldMethod, newMethod);
         this.changeStatus = evaluateChangeStatus(this.changeStatus);
+    }
+
+    public JApiMethod(JarArchiveComparator jarArchiveComparator, String name, JApiChangeStatus changeStatus, Optional<CtMethod> oldMethod, Optional<CtMethod> newMethod) {
+      super(jarArchiveComparator, name, oldMethod, newMethod, changeStatus);
+      this.oldMethod = oldMethod;
+      this.newMethod = newMethod;
+      this.returnType = computeReturnTypeChanges(oldMethod, newMethod);
+      this.changeStatus = evaluateChangeStatus(this.changeStatus);
     }
 
     private JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {

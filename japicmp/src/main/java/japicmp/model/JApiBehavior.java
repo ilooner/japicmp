@@ -1,6 +1,7 @@
 package japicmp.model;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.JarArchiveComparator;
 import japicmp.util.AnnotationHelper;
 import japicmp.util.Constants;
 import japicmp.util.ModifierHelper;
@@ -32,6 +33,7 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
     private final JApiAttribute<SyntheticAttribute> syntheticAttribute;
     protected JApiChangeStatus changeStatus;
     private boolean binaryCompatible = true;
+    private JarArchiveComparator jarArchiveComparator;
 
     public JApiBehavior(String name, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior, JApiChangeStatus changeStatus) {
         this.name = name;
@@ -44,6 +46,11 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
         this.syntheticModifier = extractSyntheticModifier(oldBehavior, newBehavior);
         this.syntheticAttribute = extractSyntheticAttribute(oldBehavior, newBehavior);
         this.changeStatus = evaluateChangeStatus(changeStatus);
+    }
+
+    public JApiBehavior(JarArchiveComparator jarArchiveComparator, String name, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior, JApiChangeStatus changeStatus) {
+      this(name, oldBehavior, newBehavior, changeStatus);
+      this.jarArchiveComparator = jarArchiveComparator;
     }
 
     @SuppressWarnings("unchecked")
@@ -97,7 +104,8 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
             if (this.abstractModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
-            if (this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+            if ((jarArchiveComparator == null || !jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreSynthetic())
+                && this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
         }

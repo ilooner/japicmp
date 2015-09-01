@@ -23,6 +23,8 @@ public class Options {
     private List<Filter> excludes = new ArrayList<>();
     private List<ClassFilter> classesExclude = new ArrayList<>();
     private boolean includeSynthetic = false;
+    private boolean ignoreSynthetic = false;
+    private boolean ignoreBridge = false;
 	private boolean ignoreMissingClasses = false;
 	private Optional<String> htmlStylesheet = Optional.absent();
 
@@ -130,8 +132,16 @@ public class Options {
         this.includeSynthetic = showSynthetic;
     }
 
+    public void setIgnoreSynthetic(boolean showNonSyntheticToSynthetic) {
+      this.ignoreSynthetic = showNonSyntheticToSynthetic;
+    }
+
     public boolean isIncludeSynthetic() {
         return includeSynthetic;
+    }
+
+    public boolean isIgnoreSynthetic() {
+      return ignoreSynthetic;
     }
 
     public void addClassesExcludeFromArgument(Optional<String> stringOptional) {
@@ -165,4 +175,12 @@ public class Options {
 	public Optional<String> getHtmlStylesheet() {
 		return htmlStylesheet;
 	}
+
+  public boolean isIgnoreBridge() {
+    return ignoreBridge;
+  }
+
+  public void setIgnoreBridge(boolean ignoreBridge) {
+    this.ignoreBridge = ignoreBridge;
+  }
 }

@@ -3,11 +3,12 @@ package japicmp.util;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.*;
+import java.lang.reflect.Modifier;
 import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtField;
 
-import java.lang.reflect.Modifier;
+import java.util.logging.Logger;
 
 public class ModifierHelper {
 	public static final int ACC_BRIDGE = 0x00000040;

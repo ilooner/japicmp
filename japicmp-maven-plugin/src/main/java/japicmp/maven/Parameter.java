@@ -11,6 +11,8 @@ public class Parameter {
     private String breakBuildOnModifications;
     private String breakBuildOnBinaryIncompatibleModifications;
     private String includeSynthetic;
+    private String ignoreSynthetic;
+    private String ignoreBridge;
 	private String ignoreMissingClasses;
 	private String skipPomModules;
 	@org.apache.maven.plugins.annotations.Parameter(required = false)
@@ -102,4 +104,20 @@ public class Parameter {
 	public void setHtmlStylesheet(String htmlStylesheet) {
 		this.htmlStylesheet = htmlStylesheet;
 	}
+
+  public String getIgnoreSynthetic() {
+    return ignoreSynthetic;
+  }
+
+  public void setIgnoreSynthetic(String ignoreSynthetic) {
+    this.ignoreSynthetic = ignoreSynthetic;
+  }
+
+  public String getIgnoreBridge() {
+    return ignoreBridge;
+  }
+
+  public void setIgnoreBridge(String ignoreBridge) {
+    this.ignoreBridge = ignoreBridge;
+  }
 }

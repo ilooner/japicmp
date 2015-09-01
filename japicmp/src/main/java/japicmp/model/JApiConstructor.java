@@ -1,6 +1,7 @@
 package japicmp.model;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.JarArchiveComparator;
 import javassist.CtConstructor;
 
 import javax.xml.bind.annotation.XmlTransient;
@@ -11,6 +12,12 @@ public class JApiConstructor extends JApiBehavior {
 
     public JApiConstructor(String name, JApiChangeStatus changeStatus, Optional<CtConstructor> oldConstructor, Optional<CtConstructor> newConstructor) {
         super(name, oldConstructor, newConstructor, changeStatus);
+        this.oldConstructor = oldConstructor;
+        this.newConstructor = newConstructor;
+    }
+
+    public JApiConstructor(JarArchiveComparator jarArchiveComparator, String name, JApiChangeStatus changeStatus, Optional<CtConstructor> oldConstructor, Optional<CtConstructor> newConstructor) {
+        super(jarArchiveComparator, name, oldConstructor, newConstructor, changeStatus);
         this.oldConstructor = oldConstructor;
         this.newConstructor = newConstructor;
     }

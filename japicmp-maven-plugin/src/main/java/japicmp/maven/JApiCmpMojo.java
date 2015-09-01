@@ -158,6 +158,16 @@ public class JApiCmpMojo extends AbstractMojo {
 				Boolean includeSynthetic = Boolean.valueOf(includeSyntheticString);
 				options.setIncludeSynthetic(includeSynthetic);
 			}
+			String ignoreSyntheticString = parameterParam.getIgnoreSynthetic();
+			if (ignoreSyntheticString != null) {
+				Boolean ignoreSynthetic = Boolean.valueOf(ignoreSyntheticString);
+				options.setIgnoreSynthetic(ignoreSynthetic);
+			}
+			String ignoreBridgeString = parameterParam.getIgnoreBridge();
+			if (ignoreBridgeString != null) {
+				Boolean ignoreBridge = Boolean.valueOf(ignoreBridgeString);
+				options.setIgnoreBridge(ignoreBridge);
+			}
 			String ignoreMissingClassesString = parameterParam.getIgnoreMissingClasses();
 			if (ignoreMissingClassesString != null) {
 				Boolean ignoreMissingClasses = Boolean.valueOf(ignoreMissingClassesString);
