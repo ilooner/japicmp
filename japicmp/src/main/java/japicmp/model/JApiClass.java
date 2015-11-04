@@ -12,7 +12,9 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
+
 import java.util.*;
+import java.util.logging.Logger;
 
 public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier,
 		JApiBinaryCompatibility, JApiHasAnnotations, JApiJavaObjectSerializationCompatibility, JApiCanBeSynthetic {
@@ -496,43 +498,53 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
 		if (changeStatus == JApiChangeStatus.UNCHANGED) {
 			if (staticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+        LOGGER.info("MODIFIED staticModifier");
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
 			if (finalModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+        LOGGER.info("MODIFIED finalModifier");
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
 			if (accessModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+        LOGGER.info("MODIFIED accessModifier");
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
 			if (abstractModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+        LOGGER.info("MODIFIED abstractModifier");
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
 			if ((jarArchiveComparator == null || !jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreSynthetic()) &&
           this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+        LOGGER.info("MODIFIED syntheticAttribute");
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
 			for (JApiImplementedInterface implementedInterface : interfaces) {
 				if (implementedInterface.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+          LOGGER.info("MODIFIED interfaces");
 					changeStatus = JApiChangeStatus.MODIFIED;
 				}
 			}
 			if (superclass.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+        LOGGER.info("MODIFIED superclass");
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
 			for (JApiField field : fields) {
 				if (field.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+          LOGGER.info("MODIFIED field");
 					changeStatus = JApiChangeStatus.MODIFIED;
 					changeCausedByClassElement = true;
 				}
 			}
 			for (JApiMethod method : methods) {
 				if (method.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+          LOGGER.info("MODIFIED " + fullyQualifiedName + " methods " + method.getName());
 					changeStatus = JApiChangeStatus.MODIFIED;
 					changeCausedByClassElement = true;
 				}
 			}
 			for (JApiConstructor constructor : constructors) {
 				if (constructor.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+          LOGGER.info("MODIFIED constructor");
 					changeStatus = JApiChangeStatus.MODIFIED;
 					changeCausedByClassElement = true;
 				}
@@ -750,4 +762,6 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	public boolean isChangeCausedByClassElement() {
 		return changeCausedByClassElement;
 	}
+
+  private static final Logger LOGGER = Logger.getLogger(JarArchiveComparator.class.getName());
 }

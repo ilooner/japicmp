@@ -15,7 +15,7 @@ public class JarArchiveComparatorOptions {
 	private boolean includeSynthetic = false;
   private boolean ignoreSynthetic = true;
 	private boolean ignoreMissingClasses = false;
-  private boolean ignoreBridge = false;
+  private boolean ignoreBridge = true;
 
 	public static JarArchiveComparatorOptions of(Options options) {
 		JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();

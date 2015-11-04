@@ -9,10 +9,13 @@ import javassist.CtMethod;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import java.util.logging.Logger;
+
 public class JApiMethod extends JApiBehavior {
     private final Optional<CtMethod> oldMethod;
     private final Optional<CtMethod> newMethod;
     private final JApiReturnType returnType;
+    private JarArchiveComparator jarArchiveComparator;
 
     public JApiMethod(String name, JApiChangeStatus changeStatus, Optional<CtMethod> oldMethod, Optional<CtMethod> newMethod) {
     	super(name, oldMethod, newMethod, changeStatus);
@@ -24,6 +27,7 @@ public class JApiMethod extends JApiBehavior {
 
     public JApiMethod(JarArchiveComparator jarArchiveComparator, String name, JApiChangeStatus changeStatus, Optional<CtMethod> oldMethod, Optional<CtMethod> newMethod) {
       super(jarArchiveComparator, name, oldMethod, newMethod, changeStatus);
+      this.jarArchiveComparator = jarArchiveComparator;
       this.oldMethod = oldMethod;
       this.newMethod = newMethod;
       this.returnType = computeReturnTypeChanges(oldMethod, newMethod);
@@ -32,8 +36,13 @@ public class JApiMethod extends JApiBehavior {
 
     private JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
         if (changeStatus == JApiChangeStatus.UNCHANGED) {
-            if (this.returnType.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-                changeStatus = JApiChangeStatus.MODIFIED;
+            JApiModifier<BridgeModifier> bridgeModifier = getBridgeModifier();
+
+            if ((bridgeModifier.getOldModifier().get() != bridgeModifier.getNewModifier().get() && (
+                jarArchiveComparator == null || !jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreBridge()))) {
+                if (this.returnType.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+                  changeStatus = JApiChangeStatus.MODIFIED;
+                }
             }
         }
         return changeStatus;
@@ -41,11 +50,24 @@ public class JApiMethod extends JApiBehavior {
 
     private JApiReturnType computeReturnTypeChanges(Optional<CtMethod> oldMethodOptional, Optional<CtMethod> newMethodOptional) {
         JApiReturnType jApiReturnType = new JApiReturnType(JApiChangeStatus.UNCHANGED, Optional.<String>absent(), Optional.<String>absent());
+
+        JApiChangeStatus changeStatusReturnType = JApiChangeStatus.UNCHANGED;
         if(oldMethodOptional.isPresent() && newMethodOptional.isPresent()) {
             String oldReturnType = computeReturnType(oldMethodOptional.get());
             String newReturnType = computeReturnType(newMethodOptional.get());
-            JApiChangeStatus changeStatusReturnType = JApiChangeStatus.UNCHANGED;
-            if (!oldReturnType.equals(newReturnType)) {
+            JApiModifier<BridgeModifier> bridgeModifier = this.getBridgeModifier();
+
+            if ((bridgeModifier.getOldModifier().get() != bridgeModifier.getNewModifier().get())) {
+              LOGGER.info("NOT EQUAL " + jarArchiveComparator);
+            }
+            if ((bridgeModifier.getOldModifier().get() != bridgeModifier.getNewModifier().get() && (
+              jarArchiveComparator != null && jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreBridge()))) {
+
+
+        LOGGER.info("Old " + bridgeModifier.getOldModifier().get() + "  New " + bridgeModifier.getNewModifier().get());
+              changeStatusReturnType = JApiChangeStatus.UNCHANGED;
+            }
+            else if (!oldReturnType.equals(newReturnType)) {
                 changeStatusReturnType = JApiChangeStatus.MODIFIED;
             }
             jApiReturnType = new JApiReturnType(changeStatusReturnType, Optional.of(oldReturnType), Optional.of(newReturnType));
@@ -59,6 +81,11 @@ public class JApiMethod extends JApiBehavior {
                 jApiReturnType = new JApiReturnType(JApiChangeStatus.NEW, Optional.<String>absent(), Optional.of(newReturnType));
             }
         }
+
+      if (changeStatusReturnType == JApiChangeStatus.MODIFIED) {
+        JApiModifier<BridgeModifier> bridgeModifier = this.getBridgeModifier();
+      }
+
         return jApiReturnType;
     }
 
@@ -114,6 +141,9 @@ public class JApiMethod extends JApiBehavior {
                 }
             }
         }
+
+        JApiModifier<BridgeModifier> bridgeModifier = getBridgeModifier();
+
         return haveSameReturnType;
     }
 
@@ -131,4 +161,6 @@ public class JApiMethod extends JApiBehavior {
     public JApiReturnType getReturnType() {
         return returnType;
     }
+
+  private static final Logger LOGGER = Logger.getLogger(JarArchiveComparator.class.getName());
 }

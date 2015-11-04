@@ -15,10 +15,12 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier, JApiBinaryCompatibility, JApiHasAnnotations, JApiHasBridgeModifier, JApiCanBeSynthetic {
     private final String name;
@@ -93,19 +95,24 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
     private JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
         if (changeStatus == JApiChangeStatus.UNCHANGED) {
             if (this.staticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+                LOGGER.info("MODIFIED staticModifier");
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
             if (this.finalModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+                LOGGER.info("MODIFIED finalModifier");
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
             if (this.accessModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+                LOGGER.info("MODIFIED accessModifier");
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
             if (this.abstractModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+                LOGGER.info("MODIFIED abstractModifier");
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
             if ((jarArchiveComparator == null || !jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreSynthetic())
                 && this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+                LOGGER.info("MODIFIED syntheticAttribute");
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
         }
@@ -335,4 +342,6 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
     public List<JApiAnnotation> getAnnotations() {
         return annotations;
     }
+
+  private static final Logger LOGGER = Logger.getLogger(JarArchiveComparator.class.getName());
 }

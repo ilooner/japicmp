@@ -1,6 +1,7 @@
 package japicmp.model;
 
 import com.google.common.base.Optional;
+import japicmp.cmp.JarArchiveComparator;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.MemberValue;
 
@@ -8,7 +9,9 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
+
 import java.util.*;
+import java.util.logging.Logger;
 
 public class JApiAnnotation implements JApiHasChangeStatus, JApiBinaryCompatibility {
 	private final String fullyQualifiedName;
@@ -91,6 +94,8 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiBinaryCompatibil
 	}
 
 	private JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
+    return JApiChangeStatus.UNCHANGED;
+    /**
 		if (changeStatus == JApiChangeStatus.UNCHANGED) {
 			for (JApiAnnotationElement annotationElement : elements) {
 				if (annotationElement.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
@@ -98,7 +103,7 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiBinaryCompatibil
 				}
 			}
 		}
-		return changeStatus;
+		return changeStatus;**/
 	}
 
 	@Override
@@ -132,4 +137,6 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiBinaryCompatibil
     public boolean isBinaryCompatible() {
         return true;
     }
+    
+  private static final Logger LOGGER = Logger.getLogger(JarArchiveComparator.class.getName());
 }
