@@ -37,13 +37,8 @@ public class JApiMethod extends JApiBehavior {
 
     private JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
         if (changeStatus == JApiChangeStatus.UNCHANGED) {
-            JApiModifier<BridgeModifier> bridgeModifier = getBridgeModifier();
-
-            if ((bridgeModifier.getOldModifier().get() != bridgeModifier.getNewModifier().get() &&
-                !jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreBridge())) {
-                if (this.returnType.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-                  changeStatus = JApiChangeStatus.MODIFIED;
-                }
+            if (this.returnType.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+                changeStatus = JApiChangeStatus.MODIFIED;
             }
         }
         return changeStatus;
