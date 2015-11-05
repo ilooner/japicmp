@@ -51,8 +51,18 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
     }
 
     public JApiBehavior(JarArchiveComparator jarArchiveComparator, String name, Optional<? extends CtBehavior> oldBehavior, Optional<? extends CtBehavior> newBehavior, JApiChangeStatus changeStatus) {
-      this(name, oldBehavior, newBehavior, changeStatus);
       this.jarArchiveComparator = jarArchiveComparator;
+
+      this.name = name;
+      computeAnnotationChanges(annotations, oldBehavior, newBehavior);
+      this.accessModifier = extractAccessModifier(oldBehavior, newBehavior);
+      this.finalModifier = extractFinalModifier(oldBehavior, newBehavior);
+      this.staticModifier = extractStaticModifier(oldBehavior, newBehavior);
+      this.abstractModifier = extractAbstractModifier(oldBehavior, newBehavior);
+      this.bridgeModifier = extractBridgeModifier(oldBehavior, newBehavior);
+      this.syntheticModifier = extractSyntheticModifier(oldBehavior, newBehavior);
+      this.syntheticAttribute = extractSyntheticAttribute(oldBehavior, newBehavior);
+      this.changeStatus = evaluateChangeStatus(changeStatus);
     }
 
     @SuppressWarnings("unchecked")
@@ -95,25 +105,27 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
     private JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
         if (changeStatus == JApiChangeStatus.UNCHANGED) {
             if (this.staticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-                LOGGER.info("MODIFIED staticModifier");
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
             if (this.finalModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-                LOGGER.info("MODIFIED finalModifier");
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
             if (this.accessModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-                LOGGER.info("MODIFIED accessModifier");
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
             if (this.abstractModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-                LOGGER.info("MODIFIED abstractModifier");
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
+            LOGGER.info("Synthetic modifier setting: " + (this.syntheticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED));
+            LOGGER.info("jarArchiveComparator: " + jarArchiveComparator);
+            LOGGER.info("ignoreSynthetic " + !jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreSynthetic());
+            LOGGER.info("sdfsdf " + ((jarArchiveComparator == null || !jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreSynthetic())
+                && this.syntheticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED));
+
             if ((jarArchiveComparator == null || !jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreSynthetic())
-                && this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
-                LOGGER.info("MODIFIED syntheticAttribute");
+                && this.syntheticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                 changeStatus = JApiChangeStatus.MODIFIED;
+                LOGGER.info("<<<<<<<<<<<<<<<<<<<modified");
             }
         }
         return changeStatus;
@@ -126,6 +138,7 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
             CtBehavior newBehavior = newBehaviorOptional.get();
             byte[] attributeOldBehavior = oldBehavior.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
             byte[] attributeNewBehavior = newBehavior.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
+
             if (attributeOldBehavior != null && attributeNewBehavior != null) {
                 jApiAttribute = new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
             } else if (attributeOldBehavior != null) {
@@ -343,5 +356,5 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
         return annotations;
     }
 
-  private static final Logger LOGGER = Logger.getLogger(JarArchiveComparator.class.getName());
+  private static final Logger LOGGER = Logger.getLogger(JApiBehavior.class.getName());
 }

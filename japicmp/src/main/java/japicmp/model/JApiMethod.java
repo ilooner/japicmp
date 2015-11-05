@@ -18,15 +18,17 @@ public class JApiMethod extends JApiBehavior {
     private JarArchiveComparator jarArchiveComparator;
 
     public JApiMethod(String name, JApiChangeStatus changeStatus, Optional<CtMethod> oldMethod, Optional<CtMethod> newMethod) {
-    	super(name, oldMethod, newMethod, changeStatus);
+      super(name, oldMethod, newMethod, changeStatus);
         this.oldMethod = oldMethod;
         this.newMethod = newMethod;
         this.returnType = computeReturnTypeChanges(oldMethod, newMethod);
         this.changeStatus = evaluateChangeStatus(this.changeStatus);
+      LOGGER.info("Wrong constructor");
     }
 
     public JApiMethod(JarArchiveComparator jarArchiveComparator, String name, JApiChangeStatus changeStatus, Optional<CtMethod> oldMethod, Optional<CtMethod> newMethod) {
       super(jarArchiveComparator, name, oldMethod, newMethod, changeStatus);
+      LOGGER.info("jarArchiveComparator " + jarArchiveComparator);
       this.jarArchiveComparator = jarArchiveComparator;
       this.oldMethod = oldMethod;
       this.newMethod = newMethod;
@@ -35,6 +37,7 @@ public class JApiMethod extends JApiBehavior {
     }
 
     private JApiChangeStatus evaluateChangeStatus(JApiChangeStatus changeStatus) {
+      LOGGER.info("Bridge modifier: " + (getBridgeModifier().getOldModifier().get() != getBridgeModifier().getNewModifier().get()));
         if (changeStatus == JApiChangeStatus.UNCHANGED) {
             JApiModifier<BridgeModifier> bridgeModifier = getBridgeModifier();
 

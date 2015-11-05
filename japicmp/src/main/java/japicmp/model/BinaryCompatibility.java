@@ -1,12 +1,9 @@
 package japicmp.model;
 
-import japicmp.cmp.JarArchiveComparator;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import static japicmp.util.ModifierHelper.hasModifierLevelDecreased;
 import static japicmp.util.ModifierHelper.isNotPrivate;
@@ -239,7 +236,6 @@ public class BinaryCompatibility {
 			}
 			// section 13.4.15 of "Java Language Specification" SE7 (Method Result Type)
 			if (method.getReturnType().getChangeStatus() == JApiChangeStatus.MODIFIED) {
-        LOGGER.info("MESSED UP METHOD " + method.getName());
 				method.setBinaryCompatible(false);
 				changedIncompatible = true;
 			}
@@ -341,6 +337,4 @@ public class BinaryCompatibility {
 		}
 		return changedIncompatible;
 	}
-
-  private static final Logger LOGGER = Logger.getLogger(JarArchiveComparator.class.getName());
 }

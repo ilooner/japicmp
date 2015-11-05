@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasTransientModifier, JApiBinaryCompatibility, JApiHasAnnotations, JApiCanBeSynthetic {
     private final JApiChangeStatus changeStatus;
@@ -49,8 +50,18 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
     }
 
 	public JApiField(JarArchiveComparator jarArchiveComparator, JApiChangeStatus changeStatus, Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional) {
-    this(changeStatus, oldFieldOptional, newFieldOptional);
     this.jarArchiveComparator = jarArchiveComparator;
+    this.oldFieldOptional = oldFieldOptional;
+    this.newFieldOptional = newFieldOptional;
+    computeAnnotationChanges(this.annotations, oldFieldOptional, newFieldOptional);
+    this.accessModifier = extractAccessModifier(oldFieldOptional, newFieldOptional);
+    this.staticModifier = extractStaticModifier(oldFieldOptional, newFieldOptional);
+    this.finalModifier = extractFinalModifier(oldFieldOptional, newFieldOptional);
+    this.transientModifier = extractTransientModifier(oldFieldOptional, newFieldOptional);
+    this.syntheticModifier = extractSyntheticModifier(oldFieldOptional, newFieldOptional);
+    this.syntheticAttribute = extractSyntheticAttribute(oldFieldOptional, newFieldOptional);
+    this.type = extractType(oldFieldOptional, newFieldOptional);
+    this.changeStatus = evaluateChangeStatus(changeStatus);
   }
 
     private void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<CtField> oldBehavior, Optional<CtField> newBehavior) {
@@ -112,7 +123,7 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
             if ((jarArchiveComparator == null || !jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreSynthetic()) &&
-                this.syntheticAttribute.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+                this.syntheticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
             if (this.type.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
@@ -129,6 +140,8 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
             CtField newField = newFieldOptional.get();
             byte[] attributeOldField = oldField.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
             byte[] attributeNewField = newField.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
+            LOGGER.info("old " + attributeOldField + " new " + attributeNewField);
+
             if (attributeOldField != null && attributeNewField != null) {
 				jApiAttribute = new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
             } else if (attributeOldField != null) {
@@ -336,4 +349,6 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
     public List<JApiAnnotation> getAnnotations() {
         return annotations;
     }
+
+  private static final Logger LOGGER = Logger.getLogger(JApiField.class.getName());
 }

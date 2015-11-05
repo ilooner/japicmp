@@ -28,6 +28,11 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 		return this;
 	}
 
+    public CtMethodBuilder bridgeModifier() {
+      this.modifier = this.modifier | ModifierHelper.ACC_BRIDGE;
+      return this;
+    }
+
     public CtMethodBuilder parameters(CtClass[] parameters) {
         return (CtMethodBuilder) super.parameters(parameters);
     }

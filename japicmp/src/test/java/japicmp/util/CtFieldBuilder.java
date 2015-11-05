@@ -18,6 +18,11 @@ public class CtFieldBuilder {
 		return this;
 	}
 
+	public CtFieldBuilder bridgeModifier() {
+		this.modifier = this.modifier | ModifierHelper.ACC_BRIDGE;
+		return this;
+	}
+
 	public CtFieldBuilder syntheticModifier() {
 		this.modifier = this.modifier | ModifierHelper.ACC_SYNTHETIC;
 		return this;
