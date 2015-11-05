@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasTransientModifier, JApiBinaryCompatibility, JApiHasAnnotations, JApiCanBeSynthetic {
     private final JApiChangeStatus changeStatus;
@@ -122,7 +121,7 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 			if (this.transientModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
 				changeStatus = JApiChangeStatus.MODIFIED;
 			}
-            if ((jarArchiveComparator == null || !jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreSynthetic()) &&
+            if (!jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreSynthetic() &&
                 this.syntheticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
@@ -140,8 +139,6 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
             CtField newField = newFieldOptional.get();
             byte[] attributeOldField = oldField.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
             byte[] attributeNewField = newField.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
-            LOGGER.info("old " + attributeOldField + " new " + attributeNewField);
-
             if (attributeOldField != null && attributeNewField != null) {
 				jApiAttribute = new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
             } else if (attributeOldField != null) {
@@ -349,6 +346,4 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
     public List<JApiAnnotation> getAnnotations() {
         return annotations;
     }
-
-  private static final Logger LOGGER = Logger.getLogger(JApiField.class.getName());
 }

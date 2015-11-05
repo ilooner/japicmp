@@ -15,12 +15,10 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier, JApiBinaryCompatibility, JApiHasAnnotations, JApiHasBridgeModifier, JApiCanBeSynthetic {
     private final String name;
@@ -116,16 +114,10 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
             if (this.abstractModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                 changeStatus = JApiChangeStatus.MODIFIED;
             }
-            LOGGER.info("Synthetic modifier setting: " + (this.syntheticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED));
-            LOGGER.info("jarArchiveComparator: " + jarArchiveComparator);
-            LOGGER.info("ignoreSynthetic " + !jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreSynthetic());
-            LOGGER.info("sdfsdf " + ((jarArchiveComparator == null || !jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreSynthetic())
-                && this.syntheticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED));
-
-            if ((jarArchiveComparator == null || !jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreSynthetic())
-                && this.syntheticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
+            
+            if (!jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreSynthetic() &&
+                this.syntheticModifier.getChangeStatus() != JApiChangeStatus.UNCHANGED) {
                 changeStatus = JApiChangeStatus.MODIFIED;
-                LOGGER.info("<<<<<<<<<<<<<<<<<<<modified");
             }
         }
         return changeStatus;
@@ -138,7 +130,6 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
             CtBehavior newBehavior = newBehaviorOptional.get();
             byte[] attributeOldBehavior = oldBehavior.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
             byte[] attributeNewBehavior = newBehavior.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
-
             if (attributeOldBehavior != null && attributeNewBehavior != null) {
                 jApiAttribute = new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
             } else if (attributeOldBehavior != null) {
@@ -355,6 +346,4 @@ public class JApiBehavior implements JApiHasModifiers, JApiHasChangeStatus, JApi
     public List<JApiAnnotation> getAnnotations() {
         return annotations;
     }
-
-  private static final Logger LOGGER = Logger.getLogger(JApiBehavior.class.getName());
 }
