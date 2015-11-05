@@ -13,9 +13,9 @@ public class JarArchiveComparatorOptions {
 	private AccessModifier accessModifier = AccessModifier.PROTECTED;
     private Filters filters = new Filters();
 	private boolean includeSynthetic = false;
-  private boolean ignoreSynthetic = true;
+  private boolean ignoreSynthetic = false;
 	private boolean ignoreMissingClasses = false;
-  private boolean ignoreBridge = true;
+  private boolean ignoreBridge = false;
 
 	public static JarArchiveComparatorOptions of(Options options) {
 		JarArchiveComparatorOptions comparatorOptions = new JarArchiveComparatorOptions();

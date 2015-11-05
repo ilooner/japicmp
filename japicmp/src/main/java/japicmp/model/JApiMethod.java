@@ -51,18 +51,11 @@ public class JApiMethod extends JApiBehavior {
 
     private JApiReturnType computeReturnTypeChanges(Optional<CtMethod> oldMethodOptional, Optional<CtMethod> newMethodOptional) {
         JApiReturnType jApiReturnType = new JApiReturnType(JApiChangeStatus.UNCHANGED, Optional.<String>absent(), Optional.<String>absent());
-
-        JApiChangeStatus changeStatusReturnType = JApiChangeStatus.UNCHANGED;
         if(oldMethodOptional.isPresent() && newMethodOptional.isPresent()) {
             String oldReturnType = computeReturnType(oldMethodOptional.get());
             String newReturnType = computeReturnType(newMethodOptional.get());
-            JApiModifier<BridgeModifier> bridgeModifier = this.getBridgeModifier();
-
-            if ((bridgeModifier.getOldModifier().get() != bridgeModifier.getNewModifier().get() &&
-                jarArchiveComparator.getJarArchiveComparatorOptions().isIgnoreBridge())) {
-              changeStatusReturnType = JApiChangeStatus.UNCHANGED;
-            }
-            else if (!oldReturnType.equals(newReturnType)) {
+            JApiChangeStatus changeStatusReturnType = JApiChangeStatus.UNCHANGED;
+            if (!oldReturnType.equals(newReturnType)) {
                 changeStatusReturnType = JApiChangeStatus.MODIFIED;
             }
             jApiReturnType = new JApiReturnType(changeStatusReturnType, Optional.of(oldReturnType), Optional.of(newReturnType));
